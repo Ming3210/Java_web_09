@@ -1,6 +1,8 @@
 package ra.com.repository;
 
 import org.springframework.stereotype.Repository;
+import ra.com.model.Gender;
+import ra.com.model.User;
 import ra.com.utils.ConnectionDB;
 
 import java.sql.CallableStatement;
@@ -45,5 +47,38 @@ public class LoginRepositoryImp implements LoginRepository{
             }
             ConnectionDB.closeConnection(conn, callableStatement);
         }
+    }
+
+    @Override
+    public User findByUsername(String username) {
+        Connection conn = null;
+        CallableStatement callableStatement = null;
+        ResultSet resultSet = null;
+        User user = null;
+        try {
+            conn = new ConnectionDB().openConnection();
+            String sql = "{call find_user_by_username(?)}";
+            callableStatement = conn.prepareCall(sql);
+            callableStatement.setString(1, username);
+
+            resultSet = callableStatement.executeQuery();
+
+            if (resultSet.next()) {
+                user = new User();
+                user.setId(resultSet.getInt("id"));
+                user.setUsername(resultSet.getString("username"));
+                user.setPassword(resultSet.getString("password"));
+                user.setEmail(resultSet.getString("email"));
+                user.setPhone(resultSet.getString("phone"));
+                user.setGender(Gender.valueOf(resultSet.getString("Gender")));
+                user.setAddress(resultSet.getString("address"));
+
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            ConnectionDB.closeConnection(conn,callableStatement);
+        }
+        return user;
     }
 }

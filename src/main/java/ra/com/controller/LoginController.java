@@ -6,6 +6,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import ra.com.model.User;
 import ra.com.service.LoginService;
 
 import javax.servlet.http.HttpSession;
@@ -28,9 +29,12 @@ public class LoginController {
                                Model model) {
 
         boolean loginSuccess = loginService.checkLogin(username, password);
+        User user = loginService.findUserByUsername(username);
+
 
         if (loginSuccess) {
             session.setAttribute("username", username);
+            session.setAttribute("user", user);
             session.setAttribute("isLoggedIn", true);
 
             return "redirect:/home";
